@@ -22,7 +22,9 @@ dependencies {
     compile "org.jmonkeyengine:jme3-plugins:$jmonkeyVersion"
     compile "org.jmonkeyengine:jme3-desktop:$jmonkeyVersion"
     compile "org.jmonkeyengine:jme3-effects:$jmonkeyVersion"
+    compile "org.jmonkeyengine:jme3-bullet:$jmonkeyVersion"
     runtime "org.jmonkeyengine:jme3-lwjgl:$jmonkeyVersion"
+    runtime "org.jmonkeyengine:jme3-bullet-native:$jmonkeyVersion"
     compile 'org.apache.pdfbox:pdfbox:2.0.4'
     compile 'org.apache.commons:commons-lang3:3.6'
     compile 'com.google.code.gson:gson:2.8.1'

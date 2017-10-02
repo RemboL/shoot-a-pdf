@@ -1,23 +1,19 @@
 package pl.rembol.jme3.shootapdf;
 
-import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.AppState;
-import com.jme3.material.Material;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-import com.jme3.renderer.RenderManager;
-import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
-import com.jme3.scene.control.AbstractControl;
-import com.jme3.scene.shape.Quad;
-import com.jme3.system.AppSettings;
-import com.jme3.texture.Image;
-import com.jme3.texture.Texture2D;
-import com.jme3.texture.plugins.AWTLoader;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.AbstractAppState;
+import com.jme3.app.state.AppState;
+import com.jme3.bullet.BulletAppState;
+import com.jme3.math.FastMath;
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Node;
+import com.jme3.system.AppSettings;
+import com.jme3.texture.Image;
+import com.jme3.texture.plugins.AWTLoader;
+import pl.rembol.jme3.shootapdf.slide.Slide;
 
 public class Main extends SimpleApplication {
 
@@ -43,39 +39,54 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         AWTLoader awtLoader = new AWTLoader();
-        List<Image> images = new PDFLoader().load("jme.pdf").stream().map(awtImage -> awtLoader.load(awtImage, true)).collect(Collectors.toList());
+        List<Image> images = new PDFLoader().load("jme.pdf").stream().map(
+                awtImage -> awtLoader.load(awtImage, true)).collect(Collectors.toList());
 
+        BulletAppState bulletAppState = new BulletAppState();
+//        bulletAppState.setDebugEnabled(true);
+        getStateManager().attach(bulletAppState);
+        getCamera().setLocation(new Vector3f(0f, 10f, 20f));
+        getCamera().lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
 
-        for (int i =0; i < images.size(); ++i) {
-        Texture2D boardTexture = new Texture2D(images.get(i));
-            Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            material.setTexture("ColorMap", boardTexture);
+        for (int i = 0; i < images.size(); ++i) {
+            Node node = new Slide(this, images.get(i), new Vector3f(0f, 1f, - i * 4f));
 
-            Quad boardShape = new Quad(4.0f, 4.0f);
-
-            Geometry board = new Geometry("Board", boardShape);
-
-            Node node = new Node();
-            node.attachChild(board);
-            board.setLocalTranslation(-2f, -2f, 0f);
-
-            board.setMaterial(material);
-            node.addControl(new AbstractControl() {
-                @Override
-                protected void controlUpdate(float tpf) {
-                    getSpatial().rotate(0, tpf, 0);
-                }
-
-                @Override
-                protected void controlRender(RenderManager rm, ViewPort vp) {
-
-                }
-            });
-
-            node.setLocalTranslation(0, -2+4*i, 0);
-            node.setLocalRotation(new Quaternion().fromAngleAxis(i, Vector3f.UNIT_Y));
+//            node.setLocalRotation(new Quaternion().fromAngleAxis(i, Vector3f.UNIT_Y));
             rootNode.attachChild(node);
+            Scene scene = new Scene(this);
+            rootNode.attachChild(scene);
         }
+        
+        getStateManager().attach(new AbstractAppState() {
+
+            private float tick = 0;
+
+            public void update(float tpf) {
+                tick += tpf;
+                getCamera().setLocation(new Vector3f(FastMath.sin(tick) * 20f, 10f, FastMath.cos(tick) * 20f));
+                getCamera().lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
+            }
+        });
+
+        getStateManager().attach(new AbstractAppState() {
+
+            private float tick = 0;
+            
+            private boolean done = false;
+
+            public void update(float tpf) {
+                tick += tpf;
+                if (tick > 3f && !done) {
+                    rootNode.getChildren().stream()
+                            .filter(Slide.class::isInstance)
+                            .map(Slide.class::cast)
+                            .forEach(slide -> slide.setKinematic(true));
+                    done = true;
+                }
+            }
+        });
+
+        
 
     }
 }
