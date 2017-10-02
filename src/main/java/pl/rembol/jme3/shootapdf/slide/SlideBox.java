@@ -23,8 +23,8 @@ public class SlideBox extends Node {
                     float texOffsetY,
                     float texSize) {
         Texture2D boardTexture = new Texture2D(image);
-        Material textureMaterial = new Material(application.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        textureMaterial.setTexture("ColorMap", boardTexture);
+        Material textureMaterial = new Material(application.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
+        textureMaterial.setTexture("DiffuseMap", boardTexture);
 
         Quad frontQuad = new Quad(size, size);
         frontQuad.setBuffer(VertexBuffer.Type.TexCoord, 2, new float[]{ texOffsetX, texOffsetY,
@@ -32,7 +32,7 @@ public class SlideBox extends Node {
                 texOffsetX + texSize, texOffsetY + texSize,
                 texOffsetX, texOffsetY + texSize });
         Geometry front = new Geometry("front", frontQuad);
-        front.setLocalTranslation(-size / 2, -size / 2, size / 2);
+        front.setLocalTranslation(-size / 2, -size / 2, .5f);
         front.setMaterial(textureMaterial);
         attachChild(front);
 
@@ -42,44 +42,46 @@ public class SlideBox extends Node {
                 texOffsetX, texOffsetY + texSize,
                 texOffsetX + texSize, texOffsetY + texSize });
         Geometry back = new Geometry("back", backQuad);
-        back.setLocalTranslation(size / 2, -size / 2, -size / 2);
+        back.setLocalTranslation(size / 2, -size / 2, -.5f);
         back.setLocalScale(new Vector3f(-1, 1, 1));
         back.setMaterial(textureMaterial);
         attachChild(back);
 
-        Quad side = new Quad(size, size);
+        Quad side = new Quad(size, 1);
+
         Geometry right = new Geometry("right", side);
-        right.setLocalTranslation(size / 2, -size / 2, size / 2);
-        right.rotate(0, FastMath.HALF_PI, 0);
+        right.setLocalTranslation(size / 2, -size / 2, -.5f);
+        right.rotate(0, FastMath.HALF_PI, FastMath.HALF_PI);
         right.setMaterial(getSideMaterial(application));
         attachChild(right);
 
         Geometry left = new Geometry("left", side);
-        left.setLocalTranslation(-size / 2, -size / 2, -size / 2);
-        left.rotate(0, -FastMath.HALF_PI, 0);
+        left.setLocalTranslation(-size / 2, -size / 2, .5f);
+        left.rotate(0, -FastMath.HALF_PI, FastMath.HALF_PI);
         left.setMaterial(getSideMaterial(application));
         attachChild(left);
 
         Geometry top = new Geometry("top", side);
-        top.setLocalTranslation(-size / 2, size / 2, size / 2);
+        top.setLocalTranslation(-size / 2, size / 2, .5f);
         top.rotate(-FastMath.HALF_PI, 0, 0);
         top.setMaterial(getSideMaterial(application));
         attachChild(top);
 
         Geometry bottom = new Geometry("bottom", side);
-        bottom.setLocalTranslation(-size / 2, -size / 2, -size / 2);
+        bottom.setLocalTranslation(-size / 2, -size / 2, -.5f);
         bottom.rotate(FastMath.HALF_PI, 0, 0);
         bottom.setMaterial(getSideMaterial(application));
         attachChild(bottom);
 
         setLocalTranslation(
-                position.x + (texOffsetX * Slide.SIZE) * 2,
-                position.y + (texOffsetY * Slide.SIZE) * 2,
+                position.x + (texOffsetX * Slide.SIZE),
+                position.y + (texOffsetY * Slide.SIZE) + size / 2,
                 position.z);
 
         RigidBodyControl rigidBodyControl = new RigidBodyControl(
-                new BoxCollisionShape(Vector3f.UNIT_XYZ.mult(size / 2)), 1f);
+                new BoxCollisionShape(new Vector3f(size / 2, size / 2, .5f)), 1f);
         rigidBodyControl.setKinematic(true);
+
 
         addControl(rigidBodyControl);
         application.getStateManager().getState(BulletAppState.class).getPhysicsSpace().add(rigidBodyControl);
@@ -87,8 +89,9 @@ public class SlideBox extends Node {
 
     private Material getSideMaterial(Application application) {
         if (sideMaterial == null) {
-            sideMaterial = new Material(application.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-            sideMaterial.setColor("Color", ColorRGBA.Brown);
+            sideMaterial = new Material(application.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
+            sideMaterial.setBoolean("UseMaterialColors", true);
+            sideMaterial.setColor("Diffuse", ColorRGBA.Brown);
         }
         return sideMaterial;
     }

@@ -14,16 +14,15 @@ public class Scene extends Node {
     
     public Scene(Application application) {
         Box box = new Box(new Vector3f(-20f, -1f, -20f), new Vector3f(20f, 0f, 20f));
-        Material material = new Material(application.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setColor("Color", new ColorRGBA(0f, .5f, 0f, 1f));
+        Material material = new Material(application.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
+        material.setBoolean("UseMaterialColors", true);
+        material.setColor("Diffuse", new ColorRGBA(0f, .5f, 0f, 1f));
         Geometry geometry = new Geometry("floor", box);
         geometry.setMaterial(material);
 
         RigidBodyControl rigidBodyControl = new RigidBodyControl(0f);
-//        rigidBodyControl.setKinematicSpatial(true);
         geometry.addControl(rigidBodyControl);
         application.getStateManager().getState(BulletAppState.class).getPhysicsSpace().add(rigidBodyControl);
-        geometry.setLocalTranslation(0, -1f, 0f);
         attachChild(geometry);
         
     }
