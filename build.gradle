@@ -1,0 +1,28 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+ext {
+    jmonkeyVersion = '3.2.0-SNAPSHOT'
+}
+
+mainClassName = 'pl.rembol.jme3.shootapdf.Main'
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.21'
+    compile 'org.slf4j:slf4j-simple:1.7.21'
+    compile 'pl.rembol.jme3.game:common:0.0.1-SNAPSHOT'
+    compile "org.jmonkeyengine:jme3-core:$jmonkeyVersion"
+    compile "org.jmonkeyengine:jme3-blender:$jmonkeyVersion"
+    compile "org.jmonkeyengine:jme3-plugins:$jmonkeyVersion"
+    compile "org.jmonkeyengine:jme3-desktop:$jmonkeyVersion"
+    compile "org.jmonkeyengine:jme3-effects:$jmonkeyVersion"
+    runtime "org.jmonkeyengine:jme3-lwjgl:$jmonkeyVersion"
+    compile 'org.apache.commons:commons-lang3:3.6'
+    compile 'com.google.code.gson:gson:2.8.1'
+}
