@@ -9,8 +9,6 @@ import com.jme3.scene.control.AbstractControl;
 
 public class PlayerMovementControl extends AbstractControl {
 
-    private static final float velocity = 50f;
-
     private SimpleApplication simpleApplication;
 
     public PlayerMovementControl(SimpleApplication simpleApplication) {
@@ -19,37 +17,19 @@ public class PlayerMovementControl extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-        getSpatial().getControl(BetterCharacterControl.class).setViewDirection(simpleApplication.getCamera().getDirection());
-        getSpatial().getControl(BetterCharacterControl.class).getWalkDirection().multLocal(.9f);
+        if (getSpatial() == null && !(getSpatial() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) getSpatial();
+        if (player.isControlEnabled()) {
+            player.getControl(BetterCharacterControl.class).setViewDirection(simpleApplication.getCamera().getDirection());
+            player.getControl(BetterCharacterControl.class).getWalkDirection().multLocal(.9f);
 
-        simpleApplication.getCamera().setLocation(getSpatial().getWorldTranslation().add(Vector3f.UNIT_Y.mult(2f)));
+            simpleApplication.getCamera().setLocation(getSpatial().getWorldTranslation().add(Vector3f.UNIT_Y.mult(2f)));
+        }
     }
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-    }
-
-    void left(float tpf) {
-        getSpatial().getControl(BetterCharacterControl.class).getWalkDirection()
-                .addLocal(simpleApplication.getCamera().getLeft().clone().setY(0).mult(tpf * velocity));
-    }
-
-    void right(float tpf) {
-        getSpatial().getControl(BetterCharacterControl.class).getWalkDirection()
-                .addLocal(simpleApplication.getCamera().getLeft().clone().setY(0).mult(tpf * velocity * -1));
-    }
-
-    void up(float tpf) {
-        getSpatial().getControl(BetterCharacterControl.class).getWalkDirection()
-                .addLocal(simpleApplication.getCamera().getDirection().clone().setY(0).mult(tpf * velocity));
-    }
-
-    void down(float tpf) {
-        getSpatial().getControl(BetterCharacterControl.class).getWalkDirection()
-                .addLocal(simpleApplication.getCamera().getDirection().clone().setY(0).mult(tpf * velocity * -1));
-    }
-
-    void jump() {
-        getSpatial().getControl(BetterCharacterControl.class).jump();
     }
 }

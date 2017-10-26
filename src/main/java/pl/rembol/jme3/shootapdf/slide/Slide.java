@@ -45,6 +45,16 @@ public class Slide extends Node {
         }
     }
 
+    public void remove() {
+        getChildren().stream()
+                .filter(SlideBox.class::isInstance)
+                .map(SlideBox.class::cast)
+                .forEach(SlideBox::remove);
+        ;
+
+        getParent().detachChild(this);
+    }
+
     public void setSlidePhysical() {
         getChildren().stream()
                 .filter(SlideBox.class::isInstance)

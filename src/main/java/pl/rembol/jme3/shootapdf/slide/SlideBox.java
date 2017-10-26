@@ -22,9 +22,12 @@ public class SlideBox extends Node {
 
     private static Material sideMaterial;
 
+    private final Application application;
+
     public SlideBox(Application application,
                     Image image, Vector3f position, Vector2f size, Vector2f texOffset,
                     Vector2f texSize) {
+        this.application = application;
         Texture2D boardTexture = new Texture2D(image);
         Material textureMaterial = new Material(application.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
         textureMaterial.setTexture("DiffuseMap", boardTexture);
@@ -104,4 +107,8 @@ public class SlideBox extends Node {
         Optional.ofNullable(getParent()).filter(Slide.class::isInstance).map(Slide.class::cast).ifPresent(Slide::setSlidePhysical);
     }
 
+    void remove() {
+        application.getStateManager().getState(BulletAppState.class).getPhysicsSpace().remove(getControl(RigidBodyControl.class));
+        getParent().detachChild(this);
+    }
 }

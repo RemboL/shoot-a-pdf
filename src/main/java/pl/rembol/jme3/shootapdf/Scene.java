@@ -13,7 +13,7 @@ import com.jme3.scene.shape.Box;
 public class Scene extends Node {
     
     public Scene(Application application) {
-        Box box = new Box(new Vector3f(-20f, -1f, -20f), new Vector3f(20f, 0f, 20f));
+        Box box = new Box(new Vector3f(-20f, -1f, -50f), new Vector3f(20f, 0f, 50f));
         Material material = new Material(application.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
         material.setBoolean("UseMaterialColors", true);
         material.setColor("Diffuse", new ColorRGBA(0f, .5f, 0f, 1f));
@@ -24,6 +24,5 @@ public class Scene extends Node {
         geometry.addControl(rigidBodyControl);
         application.getStateManager().getState(BulletAppState.class).getPhysicsSpace().add(rigidBodyControl);
         attachChild(geometry);
-        
     }
 }
