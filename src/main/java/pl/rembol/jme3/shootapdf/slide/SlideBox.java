@@ -7,6 +7,7 @@ import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -15,71 +16,74 @@ import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 
+import java.util.Optional;
+
 public class SlideBox extends Node {
 
     private static Material sideMaterial;
 
-    public SlideBox(Application application, Image image, Vector3f position, float size, float texOffsetX,
-                    float texOffsetY,
-                    float texSize) {
+    public SlideBox(Application application,
+                    Image image, Vector3f position, Vector2f size, Vector2f texOffset,
+                    Vector2f texSize) {
         Texture2D boardTexture = new Texture2D(image);
         Material textureMaterial = new Material(application.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
         textureMaterial.setTexture("DiffuseMap", boardTexture);
 
-        Quad frontQuad = new Quad(size, size);
-        frontQuad.setBuffer(VertexBuffer.Type.TexCoord, 2, new float[]{ texOffsetX, texOffsetY,
-                texOffsetX + texSize, texOffsetY,
-                texOffsetX + texSize, texOffsetY + texSize,
-                texOffsetX, texOffsetY + texSize });
+        Quad frontQuad = new Quad(size.x, size.y);
+        frontQuad.setBuffer(VertexBuffer.Type.TexCoord, 2, new float[]{ texOffset.x, texOffset.y,
+                texOffset.x + texSize.x, texOffset.y,
+                texOffset.x + texSize.x, texOffset.y + texSize.y,
+                texOffset.x, texOffset.y + texSize.y });
         Geometry front = new Geometry("front", frontQuad);
-        front.setLocalTranslation(-size / 2, -size / 2, .5f);
+        front.setLocalTranslation(-size.x / 2, -size.y / 2, .5f);
         front.setMaterial(textureMaterial);
         attachChild(front);
 
-        Quad backQuad = new Quad(size, size);
-        backQuad.setBuffer(VertexBuffer.Type.TexCoord, 2, new float[]{ texOffsetX + texSize, texOffsetY,
-                texOffsetX, texOffsetY,
-                texOffsetX, texOffsetY + texSize,
-                texOffsetX + texSize, texOffsetY + texSize });
+        Quad backQuad = new Quad(size.x, size.y);
+        backQuad.setBuffer(VertexBuffer.Type.TexCoord, 2, new float[]{ texOffset.x + texSize.x, texOffset.y,
+                texOffset.x, texOffset.y,
+                texOffset.x, texOffset.y + texSize.y,
+                texOffset.x + texSize.x, texOffset.y + texSize.y });
         Geometry back = new Geometry("back", backQuad);
-        back.setLocalTranslation(size / 2, -size / 2, -.5f);
+        back.setLocalTranslation(size.x / 2, -size.y / 2, -.5f);
         back.setLocalScale(new Vector3f(-1, 1, 1));
         back.setMaterial(textureMaterial);
         attachChild(back);
 
-        Quad side = new Quad(size, 1);
+        Quad side = new Quad(size.y, 1);
 
         Geometry right = new Geometry("right", side);
-        right.setLocalTranslation(size / 2, -size / 2, -.5f);
+        right.setLocalTranslation(size.x / 2, -size.y / 2, -.5f);
         right.rotate(0, FastMath.HALF_PI, FastMath.HALF_PI);
         right.setMaterial(getSideMaterial(application));
         attachChild(right);
 
         Geometry left = new Geometry("left", side);
-        left.setLocalTranslation(-size / 2, -size / 2, .5f);
+        left.setLocalTranslation(-size.x / 2, -size.y / 2, .5f);
         left.rotate(0, -FastMath.HALF_PI, FastMath.HALF_PI);
         left.setMaterial(getSideMaterial(application));
         attachChild(left);
 
+        side = new Quad(size.x, 1);
         Geometry top = new Geometry("top", side);
-        top.setLocalTranslation(-size / 2, size / 2, .5f);
+        top.setLocalTranslation(-size.x / 2, size.y / 2, .5f);
         top.rotate(-FastMath.HALF_PI, 0, 0);
         top.setMaterial(getSideMaterial(application));
         attachChild(top);
 
         Geometry bottom = new Geometry("bottom", side);
-        bottom.setLocalTranslation(-size / 2, -size / 2, -.5f);
+        bottom.setLocalTranslation(-size.x / 2, -size.y / 2, -.5f);
         bottom.rotate(FastMath.HALF_PI, 0, 0);
         bottom.setMaterial(getSideMaterial(application));
         attachChild(bottom);
 
         setLocalTranslation(
-                position.x + (texOffsetX * Slide.SIZE),
-                position.y + (texOffsetY * Slide.SIZE) + size / 2,
+                position.x + size.x / 2,
+                position.y + size.y / 2,
                 position.z);
 
         RigidBodyControl rigidBodyControl = new RigidBodyControl(
-                new BoxCollisionShape(new Vector3f(size / 2, size / 2, .5f)), 1f);
+                new BoxCollisionShape(new Vector3f(size.x / 2, size.y / 2, .5f)), 1f);
         rigidBodyControl.setKinematic(true);
 
 
@@ -95,9 +99,9 @@ public class SlideBox extends Node {
         }
         return sideMaterial;
     }
-    
-    protected void setKinematic(boolean kinematic) {
-        getControl(RigidBodyControl.class).setKinematic(kinematic);
+
+    public void setSlidePhysical() {
+        Optional.ofNullable(getParent()).filter(Slide.class::isInstance).map(Slide.class::cast).ifPresent(Slide::setSlidePhysical);
     }
 
 }
