@@ -5,6 +5,8 @@ import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.texture.Image;
 import pl.rembol.jme3.shootapdf.player.Player;
@@ -33,10 +35,15 @@ public class SlideManager {
 
     private Vector3f viewPosition = Vector3f.ZERO;
 
+    private final Vector2f slideSize;
+
     public SlideManager(SimpleApplication simpleApplication, List<Image> images, Player player) {
         this.simpleApplication = simpleApplication;
         this.images = images;
         this.player = player;
+
+        slideSize = new Vector2f(simpleApplication.getCamera().getWidth(), simpleApplication.getCamera().getHeight()).normalize().mult(5f);
+
         initSlide(0);
 
         setUpKeys();
@@ -82,7 +89,7 @@ public class SlideManager {
 
     private void initSlide(Integer id) {
         clearSlide(id);
-        Slide slide = new Slide(simpleApplication, images.get(id), new Vector3f(0f, 0f, (id - images.size()) * 4f));
+        Slide slide = new Slide(simpleApplication, images.get(id), new Vector3f(0f, 0f, (id - images.size()) * 4f), slideSize);
         slides.put(id, slide);
 
         Set<Integer> slidesToBeRemoved = slides.keySet().stream().filter(i -> i > currentSlide).collect(Collectors.toSet());
@@ -92,7 +99,7 @@ public class SlideManager {
         }
         slidesToBeRemoved.forEach(this::clearSlide);
         simpleApplication.getRootNode().attachChild(slide);
-        viewPosition = new Vector3f(Slide.SIZE / 2, Slide.SIZE / 2, (id - images.size()) * 4f + Slide.SIZE);
+        viewPosition = new Vector3f(0, slideSize.y / 2, (id - images.size()) * 4f + .5f + (slideSize.x / simpleApplication.getCamera().getFrustumRight() / 4 * 0.468f * 4.25f)); // ratio achieved experimentally, 0.468 is somehow connected to atan(45deg) but 4.25 - no idea...
         if (controlsEnabled) {
             simpleApplication.getCamera().setLocation(viewPosition);
             player.getControl(BetterCharacterControl.class).warp(getViewPosition().clone().setY(0f));

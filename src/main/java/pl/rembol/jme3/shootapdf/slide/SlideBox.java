@@ -9,10 +9,13 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.RenderManager;
+import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer;
+import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
@@ -94,6 +97,20 @@ public class SlideBox extends Node {
         addControl(rigidBodyControl);
         application.getStateManager().getState(BulletAppState.class).getPhysicsSpace().add(rigidBodyControl);
         setShadowMode(RenderQueue.ShadowMode.Cast);
+
+        addControl(new AbstractControl() {
+            @Override
+            protected void controlUpdate(float tpf) {
+                if (getSpatial().getWorldTranslation().getY() < -5f) {
+                    remove();
+                }
+            }
+
+            @Override
+            protected void controlRender(RenderManager rm, ViewPort vp) {
+
+            }
+        });
     }
 
     private Material getSideMaterial(Application application) {

@@ -6,7 +6,7 @@
  * ~~putting pdfs onto stacked boxes that are affectable by physics~~
  * ~~add ball cannon~~
  * ~~swap between presentation mode and fps mode~~
- * create slides with screen ratio
+ * ~~create slides with screen ratio~~
  * texture with proper scale using image ratio
  
  NTH:
