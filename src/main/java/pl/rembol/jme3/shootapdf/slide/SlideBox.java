@@ -9,6 +9,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer;
@@ -92,6 +93,7 @@ public class SlideBox extends Node {
 
         addControl(rigidBodyControl);
         application.getStateManager().getState(BulletAppState.class).getPhysicsSpace().add(rigidBodyControl);
+        setShadowMode(RenderQueue.ShadowMode.Cast);
     }
 
     private Material getSideMaterial(Application application) {

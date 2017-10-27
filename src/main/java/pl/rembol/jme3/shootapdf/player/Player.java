@@ -123,4 +123,8 @@ public class Player extends Node {
             ball.getControl(RigidBodyControl.class).setLinearVelocity(simpleApplication.getCamera().getDirection().normalize().mult(100f));
         }
     }
+
+    public Vector3f getCameraPosition() {
+        return getWorldTranslation().add(Vector3f.UNIT_Y.mult(2f));
+    }
 }

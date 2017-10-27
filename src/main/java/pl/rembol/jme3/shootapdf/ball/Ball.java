@@ -5,6 +5,7 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 
@@ -21,5 +22,6 @@ public class Ball extends Geometry {
         RigidBodyControl rigidBodyControl = new RigidBodyControl(10f);
         addControl(rigidBodyControl);
         application.getStateManager().getState(BulletAppState.class).getPhysicsSpace().add(rigidBodyControl);
+        setShadowMode(RenderQueue.ShadowMode.Cast);
     }
 }

@@ -52,45 +52,28 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleInitApp() {
 
-        initLights();
-
         AWTLoader awtLoader = new AWTLoader();
-        List<Image> images = new PDFLoader().load("jme.pdf").stream().map(
+        List<Image> images = new PDFLoader().load("jMonkeyEngine.pdf").stream().map(
                 awtImage -> awtLoader.load(awtImage, true)).collect(Collectors.toList());
 
         BulletAppState bulletAppState = new BulletAppState();
 //        bulletAppState.setDebugEnabled(true);
         getStateManager().attach(bulletAppState);
         getCamera().setLocation(new Vector3f(0f, 10f, 20f));
-        getCamera().lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
-
-        slideManager = new SlideManager(this, images);
-
-        Scene scene = new Scene(this);
-        rootNode.attachChild(scene);
-
-        getStateManager().getState(BulletAppState.class).getPhysicsSpace().addCollisionListener(new SetSlidesPhysicalOnBallHitCollisionListener());
+//        getCamera().setFrustumPerspective(90f, (float)cam.getWidth() / cam.getHeight(), 1f, 1000f);
 
         player = new Player(this);
         rootNode.attachChild(player);
 
-        new ModeManager(this, player, slideManager);
-    }
+        slideManager = new SlideManager(this, images, player);
 
-    private void initLights() {
-        FilterPostProcessor filterPostProcessor = new FilterPostProcessor(assetManager);
-        for (int i = 0; i < 4; ++i) {
-            PointLight light = new PointLight();
-            light.setPosition(new Vector3f(FastMath.sin(i * FastMath.TWO_PI / 4) * 20f, 20f, FastMath.cos(i * FastMath.TWO_PI / 4) * 20f));
-            light.setColor(ColorRGBA.LightGray);
-            rootNode.addLight(light);
-            final int SHADOWMAP_SIZE = 1024;
-            PointLightShadowFilter filter = new PointLightShadowFilter(assetManager, SHADOWMAP_SIZE);
-            filter.setLight(light);
-            filter.setEnabled(true);
-            filterPostProcessor.addFilter(filter);
-            viewPort.addProcessor(filterPostProcessor);
-        }
+        Scene scene = new Scene(this, images.size() * 4);
+        rootNode.attachChild(scene);
+
+        getStateManager().getState(BulletAppState.class).getPhysicsSpace().addCollisionListener(new SetSlidesPhysicalOnBallHitCollisionListener());
+
+        ModeManager modeManager = new ModeManager(this, player, slideManager);
+        modeManager.switchToPresentation();
     }
 
 

@@ -12,7 +12,7 @@ public class Slide extends Node {
 
     public static final float SIZE = 5f;
 
-    public static final int PIECES = 8;
+    public static final int PIECES = 6;
 
     public Slide(Application application, Image image, Vector3f position) {
         for (int i = 0; i < PIECES; ++i) {

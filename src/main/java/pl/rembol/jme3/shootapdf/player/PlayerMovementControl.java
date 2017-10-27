@@ -25,7 +25,7 @@ public class PlayerMovementControl extends AbstractControl {
             player.getControl(BetterCharacterControl.class).setViewDirection(simpleApplication.getCamera().getDirection());
             player.getControl(BetterCharacterControl.class).getWalkDirection().multLocal(.9f);
 
-            simpleApplication.getCamera().setLocation(getSpatial().getWorldTranslation().add(Vector3f.UNIT_Y.mult(2f)));
+            simpleApplication.getCamera().setLocation(player.getCameraPosition());
         }
     }
 
