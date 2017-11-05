@@ -6,28 +6,28 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.texture.Image;
-import org.omg.CORBA.PERSIST_STORE;
 
 public class Slide extends Node {
 
     public static final int PIECES = 6;
 
     public Slide(Application application, Image image, Vector3f position, Vector2f slideSize) {
+        // building a brick wall
         for (int i = 0; i < PIECES; ++i) {
             for (int j = 0; j < PIECES; ++j) {
                 float offsetSize = 1.0f / PIECES;
                 Vector2f offset;
                 Vector2f brickSize;
                 if (i == 0 && j % 2 == 0) {
-//                     left side
+                    // left side
                     offset = new Vector2f(offsetSize * i, offsetSize * j);
                     brickSize = new Vector2f(1.0f / PIECES, 1.0f / PIECES);
                 } else if (i == (PIECES - 1) && ((i + j) % 2) == 1) {
-//                     right side
+                    // right side
                     offset = new Vector2f(offsetSize * i, offsetSize * j);
                     brickSize = new Vector2f(1.0f / PIECES, 1.0f / PIECES);
                 } else if ((i + j) % 2 == 0) {
-//                     odd part - don't add
+                    // odd part - don't add
                     continue;
                 } else {
                     offset = new Vector2f(offsetSize * i, offsetSize * j);

@@ -125,6 +125,6 @@ public class Player extends Node {
     }
 
     public Vector3f getCameraPosition() {
-        return getWorldTranslation().add(Vector3f.UNIT_Y.mult(2f));
+        return getWorldTranslation().add(Vector3f.UNIT_Y.mult(1f));
     }
 }

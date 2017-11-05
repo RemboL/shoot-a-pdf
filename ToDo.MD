@@ -7,8 +7,9 @@
  * ~~add ball cannon~~
  * ~~swap between presentation mode and fps mode~~
  * ~~create slides with screen ratio~~
- * texture with proper scale using image ratio
+ * ~~texture with proper scale using image ratio~~
  
  NTH:
  * different formats (list of jpg/png)
+ * animated gifs
  * add some bots maybe

@@ -10,6 +10,7 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.light.PointLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.shadow.PointLightShadowFilter;
@@ -53,8 +54,9 @@ public class Main extends SimpleApplication {
     public void simpleInitApp() {
 
         AWTLoader awtLoader = new AWTLoader();
-        List<Image> images = new PDFLoader().load("jMonkeyEngine.pdf").stream().map(
+        List<Image> images = new PDFLoader().load("jme.pdf").stream().map(
                 awtImage -> awtLoader.load(awtImage, true)).collect(Collectors.toList());
+        List<Image> rescaledImages = new ImageRescaler(this).rescale(images);
 
         BulletAppState bulletAppState = new BulletAppState();
 //        bulletAppState.setDebugEnabled(true);
@@ -62,10 +64,11 @@ public class Main extends SimpleApplication {
         getCamera().setLocation(new Vector3f(0f, 10f, 20f));
 //        getCamera().setFrustumPerspective(90f, (float)cam.getWidth() / cam.getHeight(), 1f, 1000f);
 
+        new SkyBox(this);
         player = new Player(this);
         rootNode.attachChild(player);
 
-        slideManager = new SlideManager(this, images, player);
+        slideManager = new SlideManager(this, rescaledImages, player);
 
         Scene scene = new Scene(this, images.size() * 4);
         rootNode.attachChild(scene);
