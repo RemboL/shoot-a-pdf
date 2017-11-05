@@ -5,13 +5,13 @@ import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
-import com.jme3.texture.Image;
+import com.jme3.texture.Texture2D;
 
 public class Slide extends Node {
 
     public static final int PIECES = 6;
 
-    public Slide(Application application, Image image, Vector3f position, Vector2f slideSize) {
+    public Slide(Application application, Texture2D texture, Vector3f position, Vector2f slideSize) {
         // building a brick wall
         for (int i = 0; i < PIECES; ++i) {
             for (int j = 0; j < PIECES; ++j) {
@@ -34,7 +34,7 @@ public class Slide extends Node {
                     brickSize = new Vector2f(2.0f / PIECES, 1.0f / PIECES);
                 }
                 attachChild(new SlideBox(application,
-                        image,
+                        texture,
                         position.add(new Vector3f((offset.x - .5f) * slideSize.x, offset.y * slideSize.y, 0)),
                         new Vector2f(brickSize.x * slideSize.x, brickSize.y * slideSize.y),
                         offset,

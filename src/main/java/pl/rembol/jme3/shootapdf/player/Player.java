@@ -11,7 +11,7 @@ import pl.rembol.jme3.shootapdf.ball.Ball;
 
 public class Player extends Node {
 
-    private static final float velocity = 50f;
+    private static final float velocity = 100f;
 
     private final SimpleApplication simpleApplication;
 
@@ -81,7 +81,7 @@ public class Player extends Node {
 
     void lookDown(float tpf) {
         if (controlsEnabled) {
-            if (simpleApplication.getCamera().getDirection().y < 0.8f) {
+            if (simpleApplication.getCamera().getDirection().y > -0.8f) {
                 simpleApplication.getCamera().setRotation(
                         simpleApplication.getCamera().getRotation().mult(new Quaternion().fromAngleAxis(tpf, Vector3f.UNIT_X))
                 );
@@ -91,7 +91,7 @@ public class Player extends Node {
 
     void lookUp(float tpf) {
         if (controlsEnabled) {
-            if (simpleApplication.getCamera().getDirection().y > -0.8f) {
+            if (simpleApplication.getCamera().getDirection().y < 0.8f) {
                 simpleApplication.getCamera().setRotation(
                         simpleApplication.getCamera().getRotation().mult(new Quaternion().fromAngleAxis(-tpf, Vector3f.UNIT_X))
                 );

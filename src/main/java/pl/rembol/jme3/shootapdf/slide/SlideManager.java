@@ -3,12 +3,13 @@ package pl.rembol.jme3.shootapdf.slide;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.math.FastMath;
+import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.texture.Image;
+import com.jme3.texture.Texture2D;
 import pl.rembol.jme3.shootapdf.player.Player;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class SlideManager {
 
     private final SimpleApplication simpleApplication;
 
-    private final List<Image> images;
+    private final List<Texture2D> images;
 
     private final Player player;
 
@@ -37,14 +38,16 @@ public class SlideManager {
 
     private final Vector2f slideSize;
 
-    public SlideManager(SimpleApplication simpleApplication, List<Image> images, Player player) {
+    public SlideManager(SimpleApplication simpleApplication, List<Texture2D> images, Player player) {
         this.simpleApplication = simpleApplication;
         this.images = images;
         this.player = player;
 
         slideSize = new Vector2f(simpleApplication.getCamera().getWidth(), simpleApplication.getCamera().getHeight()).normalize().mult(5f);
 
-        initSlide(0);
+        if (!images.isEmpty()) {
+            initSlide(0);
+        }
 
         setUpKeys();
     }
@@ -68,6 +71,7 @@ public class SlideManager {
         };
 
         simpleApplication.getInputManager().addMapping("NextSlide", new KeyTrigger(KeyInput.KEY_RIGHT));
+        simpleApplication.getInputManager().addMapping("NextSlide", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         simpleApplication.getInputManager().addMapping("PrevSlide", new KeyTrigger(KeyInput.KEY_LEFT));
         simpleApplication.getInputManager().addListener(nextSlideAction, "NextSlide");
         simpleApplication.getInputManager().addListener(prevSlideAction, "PrevSlide");

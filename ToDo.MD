@@ -10,6 +10,7 @@
  * ~~texture with proper scale using image ratio~~
  
  NTH:
- * different formats (list of jpg/png)
- * animated gifs
+ * ~~different formats (list of jpg/png)~~
+ * ~~animated gifs~~
+ * directory loader
  * add some bots maybe

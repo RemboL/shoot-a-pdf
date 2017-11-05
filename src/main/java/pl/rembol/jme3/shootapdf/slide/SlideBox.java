@@ -17,7 +17,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.shape.Quad;
-import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 
 import java.util.Optional;
@@ -29,12 +28,11 @@ public class SlideBox extends Node {
     private final Application application;
 
     public SlideBox(Application application,
-                    Image image, Vector3f position, Vector2f size, Vector2f texOffset,
+                    Texture2D texture, Vector3f position, Vector2f size, Vector2f texOffset,
                     Vector2f texSize) {
         this.application = application;
-        Texture2D boardTexture = new Texture2D(image);
         Material textureMaterial = new Material(application.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
-        textureMaterial.setTexture("DiffuseMap", boardTexture);
+        textureMaterial.setTexture("DiffuseMap", texture);
 
         Quad frontQuad = new Quad(size.x, size.y);
         frontQuad.setBuffer(VertexBuffer.Type.TexCoord, 2, new float[]{ texOffset.x, texOffset.y,

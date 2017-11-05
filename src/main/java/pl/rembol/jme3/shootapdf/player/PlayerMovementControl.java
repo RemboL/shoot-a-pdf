@@ -2,7 +2,6 @@ package pl.rembol.jme3.shootapdf.player;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.control.BetterCharacterControl;
-import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.control.AbstractControl;
