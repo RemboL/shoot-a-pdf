@@ -1,5 +1,8 @@
 package pl.rembol.jme3.shootapdf;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
@@ -11,9 +14,6 @@ import com.jme3.scene.shape.Quad;
 import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ImageRescaler {
 
@@ -44,10 +44,10 @@ public class ImageRescaler {
 
         Quad quad;
 
-        if (offTexture.getImage().getHeight() * camera.getWidth() < camera.getHeight() * offTexture.getImage().getWidth()) {
-            quad = new Quad(1f, (offTexture.getImage().getHeight() * camera.getWidth()) / (1f * offTexture.getImage().getWidth() * camera.getHeight()));
+        if (texture.getImage().getHeight() * camera.getWidth() < camera.getHeight() * texture.getImage().getWidth()) {
+            quad = new Quad(1f, (texture.getImage().getHeight() * camera.getWidth()) / (1f * texture.getImage().getWidth() * camera.getHeight()));
         } else {
-            quad = new Quad((camera.getHeight() * offTexture.getImage().getWidth()) / (1f * offTexture.getImage().getHeight() * camera.getWidth()), 1f);
+            quad = new Quad((camera.getHeight() * texture.getImage().getWidth()) / (1f * texture.getImage().getHeight() * camera.getWidth()), 1f);
         }
 
         Geometry geometry = new Geometry("slide", quad);
