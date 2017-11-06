@@ -109,11 +109,11 @@ public class GifLoader implements ImageLoader {
     }
 
     @Override
-    public List<Texture2D> load(String fileLocation) {
+    public List<Texture2D> load(File file) {
         try {
             List<GifFrame> frames = new ArrayList<>();
             GIFImageReader ir = new GIFImageReader(new GIFImageReaderSpi());
-            ir.setInput(ImageIO.createImageInputStream(new File(fileLocation)));
+            ir.setInput(ImageIO.createImageInputStream(file));
 
             AWTLoader awtLoader = new AWTLoader();
             for (int i = 0; i < ir.getNumImages(true); i++) {
@@ -132,7 +132,7 @@ public class GifLoader implements ImageLoader {
     }
 
     @Override
-    public boolean canLoad(String fileLocation) {
-        return fileLocation.toLowerCase().endsWith(".gif");
+    public boolean canLoad(File file) {
+        return file.isFile() && file.getName().toLowerCase().endsWith(".gif");
     }
 }

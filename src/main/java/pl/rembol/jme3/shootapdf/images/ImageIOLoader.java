@@ -14,9 +14,9 @@ import java.util.stream.Stream;
 class ImageIOLoader implements ImageLoader {
 
     @Override
-    public List<Texture2D> load(String fileLocation) {
+    public List<Texture2D> load(File file) {
         try {
-            BufferedImage img = ImageIO.read(new File(fileLocation));
+            BufferedImage img = ImageIO.read(file);
             return Collections.singletonList(new Texture2D(new AWTLoader().load(img, true)));
         } catch (IOException e) {
             e.printStackTrace();
@@ -25,7 +25,7 @@ class ImageIOLoader implements ImageLoader {
     }
 
     @Override
-    public boolean canLoad(String fileLocation) {
-        return Stream.of(".png", ".jpeg", ".jpg", ".bmp").anyMatch(extension -> fileLocation.toLowerCase().endsWith(extension));
+    public boolean canLoad(File file) {
+        return file.isFile() && Stream.of(".png", ".jpeg", ".jpg", ".bmp").anyMatch(extension -> file.getName().toLowerCase().endsWith(extension));
     }
 }

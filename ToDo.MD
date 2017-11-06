@@ -12,5 +12,6 @@
  NTH:
  * ~~different formats (list of jpg/png)~~
  * ~~animated gifs~~
- * directory loader
+ * ~~directory loader~~
+ * loading mpegs
  * add some bots maybe

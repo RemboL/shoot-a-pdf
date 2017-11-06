@@ -12,8 +12,10 @@ import pl.rembol.jme3.shootapdf.player.Player;
 import pl.rembol.jme3.shootapdf.slide.SlideManager;
 
 import java.awt.*;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class Main extends SimpleApplication {
@@ -30,8 +32,7 @@ public class Main extends SimpleApplication {
 
         // for debug
         if (files.isEmpty()) {
-//            this.files = Arrays.asList("jme.pdf");
-            this.files = Arrays.asList("source.gif", "source2.gif");
+            this.files = Arrays.asList("jme.pdf");
         }
     }
 
@@ -66,7 +67,7 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleInitApp() {
 
-        List<Texture2D> images = new ImagesLoader(this).loadImages(files);
+        List<Texture2D> images = new ImagesLoader(this).loadImages(files.stream().map(File::new).collect(Collectors.toList()));
         List<Texture2D> rescaledImages = new ImageRescaler(this).rescale(images);
 
         BulletAppState bulletAppState = new BulletAppState();

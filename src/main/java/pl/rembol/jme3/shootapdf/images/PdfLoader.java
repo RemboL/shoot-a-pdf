@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 class PdfLoader implements ImageLoader {
-    public List<Texture2D> load(String fileLocation) {
-            File file = new File(fileLocation);
-
+    public List<Texture2D> load(File file) {
         try (PDDocument doc = PDDocument.load(file)) {
             PDFRenderer renderer = new PDFRenderer(doc);
             List<BufferedImage> pages = new ArrayList<>();
@@ -37,7 +35,7 @@ class PdfLoader implements ImageLoader {
     }
 
     @Override
-    public boolean canLoad(String fileLocation) {
-        return fileLocation.toLowerCase().endsWith(".pdf");
+    public boolean canLoad(File file) {
+        return file.isFile() && file.getName().toLowerCase().endsWith(".pdf");
     }
 }
