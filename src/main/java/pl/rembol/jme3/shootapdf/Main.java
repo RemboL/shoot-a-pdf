@@ -1,22 +1,22 @@
 package pl.rembol.jme3.shootapdf;
 
+import java.awt.DisplayMode;
+import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppState;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.math.Vector3f;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture2D;
-import com.sun.javafx.application.PlatformImpl;
 import pl.rembol.jme3.shootapdf.images.ImagesLoader;
 import pl.rembol.jme3.shootapdf.mode.ModeManager;
 import pl.rembol.jme3.shootapdf.player.Player;
 import pl.rembol.jme3.shootapdf.slide.SlideManager;
-
-import java.awt.*;
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class Main extends SimpleApplication {
@@ -30,9 +30,6 @@ public class Main extends SimpleApplication {
     public Main(List<String> files) {
         super(new AppState[0]);
         this.files = files;
-
-        PlatformImpl.startup(() -> {
-        });
 
         // for debug
         if (files.isEmpty()) {
