@@ -14,4 +14,5 @@
  * ~~animated gifs~~
  * ~~directory loader~~
  * loading mpegs
+ * load only 5-10 slides forward and backward (load more in separate thread)
  * add some bots maybe

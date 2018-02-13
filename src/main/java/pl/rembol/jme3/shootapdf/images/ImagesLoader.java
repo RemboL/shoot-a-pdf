@@ -20,6 +20,7 @@ public class ImagesLoader {
         imageLoaders.add(new ImageIOLoader());
         imageLoaders.add(new GifLoader(simpleApplication));
         imageLoaders.add(new DirectoryLoader(this));
+        imageLoaders.add(new VideoLoader());
     }
 
     public List<Texture2D> loadImages(List<File> files) {

@@ -6,6 +6,7 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.math.Vector3f;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture2D;
+import com.sun.javafx.application.PlatformImpl;
 import pl.rembol.jme3.shootapdf.images.ImagesLoader;
 import pl.rembol.jme3.shootapdf.mode.ModeManager;
 import pl.rembol.jme3.shootapdf.player.Player;
@@ -30,9 +31,12 @@ public class Main extends SimpleApplication {
         super(new AppState[0]);
         this.files = files;
 
+        PlatformImpl.startup(() -> {
+        });
+
         // for debug
         if (files.isEmpty()) {
-            this.files = Arrays.asList("jme.pdf");
+            this.files = Arrays.asList("pres");
         }
     }
 
