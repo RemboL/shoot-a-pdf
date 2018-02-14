@@ -1,18 +1,8 @@
 package pl.rembol.jme3.shootapdf.images;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-import javax.swing.JFrame;
-
-import com.jme3.texture.Texture;
+import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
-import com.jme3.texture.plugins.AWTLoader;
+import com.jme3.util.BufferUtils;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
@@ -22,9 +12,17 @@ import uk.co.caprica.vlcj.player.direct.RenderCallbackAdapter;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 import uk.co.caprica.vlcj.player.media.callback.nonseekable.FileInputStreamMedia;
 
+import java.io.File;
+import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
 class VideoLoader implements ImageLoader {
 
-    private BufferedImage image;
+    DirectMediaPlayerComponent mediaPlayerComponent;
+
+    private Texture2D texture;
 
     private static final int width = 600;
 
@@ -34,62 +32,66 @@ class VideoLoader implements ImageLoader {
         new NativeDiscovery().discover();
     }
 
-    private class TutorialRenderCallbackAdapter extends RenderCallbackAdapter {
+    @Override
+    public List<Texture2D> load(File file) {
 
-        private final BufferedImage image;
-        private final Texture texture;
-        private final AWTLoader awtLoader = new AWTLoader();
+        texture = new Texture2D();
 
-        private TutorialRenderCallbackAdapter(BufferedImage image, Texture texture) {
-            super(new int[width * height]);
-            this.image = image;
+        Image image = new Image();
+        image.setWidth(width);
+        image.setHeight(height);
+        image.setFormat(Image.Format.BGRA8);
+        image.setData(BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4));
+        texture.setImage(image);
+        BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(width, height);
+
+
+        mediaPlayerComponent = new DirectMediaPlayerComponent(bufferFormatCallback) {
+            @Override
+            protected RenderCallback onGetRenderCallback() {
+                return new JmeRenderCallbackAdapter(texture);
+            }
+        };
+
+        mediaPlayerComponent.getMediaPlayer().playMedia(new FileInputStreamMedia(file));
+        mediaPlayerComponent.getMediaPlayer().play();
+        mediaPlayerComponent.getMediaPlayer().setRepeat(true);
+
+        return Collections.singletonList(texture);
+    }
+
+    public class JmeRenderCallbackAdapter extends RenderCallbackAdapter {
+
+        private ByteBuffer imageBuffer;
+        private Texture2D texture;
+        int width;
+        int height;
+
+        JmeRenderCallbackAdapter(Texture2D texture) {
+            super(new int[texture.getImage().getWidth() * texture.getImage().getHeight()]);
+            width = texture.getImage().getWidth();
+            height = texture.getImage().getHeight();
+            imageBuffer = BufferUtils.clone(texture.getImage().getData(0));
             this.texture = texture;
         }
 
         @Override
         protected void onDisplay(DirectMediaPlayer mediaPlayer, int[] rgbBuffer) {
             // Simply copy buffer to the image and repaint
-            image.setRGB(0, 0, width, height, rgbBuffer, 0, width);
-            texture.setImage(awtLoader.load(image, true));
+            if (imageBuffer != null) {
+                imageBuffer.rewind();
+                imageBuffer.clear();
+                for (int i : rgbBuffer) {
+                    imageBuffer.putInt(i);
+                }
+                texture.getImage().setData(BufferUtils.clone(imageBuffer));
+                texture.getImage().setUpdateNeeded();
+            }
         }
     }
 
     @Override
-    public List<Texture2D> load(File file) {
-
-        JFrame frame = new JFrame("Direct Media Player");
-        frame.setBounds(100, 100, width, height);
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
-        image = GraphicsEnvironment
-                .getLocalGraphicsEnvironment()
-                .getDefaultScreenDevice()
-                .getDefaultConfiguration()
-                .createCompatibleImage(width, height);
-        BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(width, height);
-        Texture2D texture = new Texture2D(new AWTLoader().load(image, true));
-        DirectMediaPlayerComponent mediaPlayerComponent = new DirectMediaPlayerComponent(bufferFormatCallback) {
-            @Override
-            protected RenderCallback onGetRenderCallback() {
-                return new TutorialRenderCallbackAdapter(image, texture);
-            }
-        };
-
-        mediaPlayerComponent.getMediaPlayer().playMedia(new FileInputStreamMedia(file));
-        mediaPlayerComponent.getMediaPlayer().play();
-
-        frame.setVisible(true);
-
-        return  Collections.singletonList(texture);
-    }
-
-    @Override
     public boolean canLoad(File file) {
-        return file.isFile() && Stream.of(".flv", ".mpeg").anyMatch(extension -> file.getName().toLowerCase().endsWith(extension));
+        return file.isFile() && Stream.of(".flv", ".mpeg", ".mp4").anyMatch(extension -> file.getName().toLowerCase().endsWith(extension));
     }
 }
