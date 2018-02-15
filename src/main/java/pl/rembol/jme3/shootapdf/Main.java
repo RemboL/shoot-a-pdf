@@ -13,11 +13,11 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.math.Vector3f;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture2D;
+import com.sun.javafx.application.PlatformImpl;
 import pl.rembol.jme3.shootapdf.images.ImagesLoader;
 import pl.rembol.jme3.shootapdf.mode.ModeManager;
 import pl.rembol.jme3.shootapdf.player.Player;
 import pl.rembol.jme3.shootapdf.slide.SlideManager;
-
 
 public class Main extends SimpleApplication {
 
@@ -37,8 +37,8 @@ public class Main extends SimpleApplication {
         }
     }
 
-    public static void main(String[] args) {
-
+    public static void main(final String[] args) {
+        
         Main app = new Main(Arrays.asList(args));
 
         app.setShowSettings(false);
@@ -67,6 +67,8 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        PlatformImpl.startup(() -> {
+        });
 
         List<Texture2D> images = new ImagesLoader(this).loadImages(files.stream().map(File::new).collect(Collectors.toList()));
         List<Texture2D> rescaledImages = new ImageRescaler(this).rescale(images);
@@ -92,4 +94,9 @@ public class Main extends SimpleApplication {
     }
 
 
+    @Override
+    public void destroy() {
+        super.destroy();
+        PlatformImpl.exit();
+    }
 }

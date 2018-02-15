@@ -5,6 +5,14 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
+    maven {
+        url 'http://dl.bintray.com/jmonkeyengine/contrib'
+    }
+}
+
+jfx {
+    mainClass = 'pl.rembol.jme3.shootapdf.Main'
+    vendor = 'RemboL'
 }
 
 ext {
@@ -24,9 +32,10 @@ dependencies {
     compile "org.jmonkeyengine:jme3-effects:$jmonkeyVersion"
     compile "org.jmonkeyengine:jme3-bullet:$jmonkeyVersion"
     runtime "org.jmonkeyengine:jme3-lwjgl:$jmonkeyVersion"
+    runtime "org.jmonkeyengine:jme3-jogl:$jmonkeyVersion"
     runtime "org.jmonkeyengine:jme3-bullet-native:$jmonkeyVersion"
     compile 'org.apache.pdfbox:pdfbox:2.0.4'
     compile 'org.apache.commons:commons-lang3:3.6'
     compile 'com.google.code.gson:gson:2.8.1'
-    compile 'uk.co.caprica:vlcj:3.10.1'
+    compile 'com.jme3x:jfx:2.184.2016-04-30_145140-ccbd413'
 }

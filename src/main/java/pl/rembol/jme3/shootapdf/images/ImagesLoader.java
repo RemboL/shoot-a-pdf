@@ -1,13 +1,13 @@
 package pl.rembol.jme3.shootapdf.images;
 
-import com.jme3.app.SimpleApplication;
-import com.jme3.texture.Texture2D;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.jme3.app.SimpleApplication;
+import com.jme3.texture.Texture2D;
 
 public class ImagesLoader {
 
@@ -20,7 +20,7 @@ public class ImagesLoader {
         imageLoaders.add(new ImageIOLoader());
         imageLoaders.add(new GifLoader(simpleApplication));
         imageLoaders.add(new DirectoryLoader(this));
-        imageLoaders.add(new VideoLoader());
+        imageLoaders.add(new VideoLoader(simpleApplication));
     }
 
     public List<Texture2D> loadImages(List<File> files) {
