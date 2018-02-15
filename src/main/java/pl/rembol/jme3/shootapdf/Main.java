@@ -17,6 +17,7 @@ import com.sun.javafx.application.PlatformImpl;
 import pl.rembol.jme3.shootapdf.images.ImagesLoader;
 import pl.rembol.jme3.shootapdf.mode.ModeManager;
 import pl.rembol.jme3.shootapdf.player.Player;
+import pl.rembol.jme3.shootapdf.slide.SlideFactory;
 import pl.rembol.jme3.shootapdf.slide.SlideManager;
 
 public class Main extends SimpleApplication {
@@ -70,8 +71,7 @@ public class Main extends SimpleApplication {
         PlatformImpl.startup(() -> {
         });
 
-        List<Texture2D> images = new ImagesLoader(this).loadImages(files.stream().map(File::new).collect(Collectors.toList()));
-        List<Texture2D> rescaledImages = new ImageRescaler(this).rescale(images);
+        List<SlideFactory> images = new ImagesLoader(this).loadImages(files.stream().map(File::new).collect(Collectors.toList()));
 
         BulletAppState bulletAppState = new BulletAppState();
 //        bulletAppState.setDebugEnabled(true);
@@ -82,7 +82,7 @@ public class Main extends SimpleApplication {
         player = new Player(this);
         rootNode.attachChild(player);
 
-        slideManager = new SlideManager(this, rescaledImages, player);
+        slideManager = new SlideManager(this, images, player);
 
         Scene scene = new Scene(this, images.size() * 4);
         rootNode.attachChild(scene);

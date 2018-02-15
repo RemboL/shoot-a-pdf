@@ -28,7 +28,7 @@ public class ImageRescaler {
         return images.stream().map(this::rescale).collect(Collectors.toList());
     }
 
-    private Texture2D rescale(Texture2D texture) {
+    public Texture2D rescale(Texture2D texture) {
         Camera camera = new Camera(application.getCamera().getWidth(), application.getCamera().getHeight());
         camera.setLocation(new Vector3f(0, 0, 1));
         camera.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);

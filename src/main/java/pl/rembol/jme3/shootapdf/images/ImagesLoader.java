@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.texture.Texture2D;
+import pl.rembol.jme3.shootapdf.ImageRescaler;
+import pl.rembol.jme3.shootapdf.slide.SlideFactory;
 
 public class ImagesLoader {
 
@@ -15,22 +16,24 @@ public class ImagesLoader {
 
     public ImagesLoader(SimpleApplication simpleApplication) {
         imageLoaders = new ArrayList<>();
+        
+        ImageRescaler imageRescaler = new ImageRescaler(simpleApplication);
 
-        imageLoaders.add(new PdfLoader());
-        imageLoaders.add(new ImageIOLoader());
-        imageLoaders.add(new GifLoader(simpleApplication));
+        imageLoaders.add(new PdfLoader(imageRescaler));
+        imageLoaders.add(new ImageIOLoader(imageRescaler));
+        imageLoaders.add(new GifLoader(simpleApplication, imageRescaler));
         imageLoaders.add(new DirectoryLoader(this));
-        imageLoaders.add(new VideoLoader(simpleApplication));
+        imageLoaders.add(new VideoLoader(simpleApplication, imageRescaler));
     }
 
-    public List<Texture2D> loadImages(List<File> files) {
+    public List<SlideFactory> loadImages(List<File> files) {
         return files.stream()
                 .map(this::loadImages)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
 
-    private List<Texture2D> loadImages(File file) {
+    private List<SlideFactory> loadImages(File file) {
         return imageLoaders
                 .stream()
                 .filter(imageLoader -> imageLoader.canLoad(file))

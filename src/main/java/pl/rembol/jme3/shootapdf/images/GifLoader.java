@@ -25,6 +25,9 @@ import com.jme3.texture.plugins.AWTLoader;
 import com.sun.imageio.plugins.gif.GIFImageMetadata;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
+import pl.rembol.jme3.shootapdf.ImageRescaler;
+import pl.rembol.jme3.shootapdf.slide.SimpleTextureSlideFactory;
+import pl.rembol.jme3.shootapdf.slide.SlideFactory;
 
 public class GifLoader implements ImageLoader {
 
@@ -40,9 +43,12 @@ public class GifLoader implements ImageLoader {
     }
 
     private final SimpleApplication simpleApplication;
+    
+    private final ImageRescaler imageRescaler;
 
-    GifLoader(SimpleApplication simpleApplication) {
+    GifLoader(SimpleApplication simpleApplication, ImageRescaler imageRescaler) {
         this.simpleApplication = simpleApplication;
+        this.imageRescaler = imageRescaler;
     }
 
     private class GifAnimAppState extends AbstractAppState {
@@ -109,7 +115,7 @@ public class GifLoader implements ImageLoader {
     }
 
     @Override
-    public List<Texture2D> load(File file) {
+    public List<SlideFactory> load(File file) {
         try {
             List<GifFrame> frames = new ArrayList<>();
             GIFImageReader ir = new GIFImageReader(new GIFImageReaderSpi());
@@ -124,7 +130,7 @@ public class GifLoader implements ImageLoader {
 
             Texture2D texture = new Texture2D(frames.get(0).image.getWidth(), frames.get(0).image.getHeight(), Image.Format.RGBA8);
             simpleApplication.getStateManager().attach(new GifAnimAppState(texture, frames));
-            return Collections.singletonList(texture);
+            return Collections.singletonList(new SimpleTextureSlideFactory(imageRescaler.rescale(texture)));
         } catch (IOException exception) {
             return Collections.emptyList();
         }

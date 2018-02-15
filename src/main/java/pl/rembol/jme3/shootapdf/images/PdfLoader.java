@@ -1,10 +1,5 @@
 package pl.rembol.jme3.shootapdf.images;
 
-import com.jme3.texture.Texture2D;
-import com.jme3.texture.plugins.AWTLoader;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +8,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
+import com.jme3.texture.Texture2D;
+import com.jme3.texture.plugins.AWTLoader;
+import pl.rembol.jme3.shootapdf.ImageRescaler;
+import pl.rembol.jme3.shootapdf.slide.SimpleTextureSlideFactory;
+import pl.rembol.jme3.shootapdf.slide.SlideFactory;
+
 class PdfLoader implements ImageLoader {
-    public List<Texture2D> load(File file) {
+    
+    private final ImageRescaler imageRescaler;
+
+    PdfLoader(ImageRescaler imageRescaler) {
+        this.imageRescaler = imageRescaler;
+    }
+
+    public List<SlideFactory> load(File file) {
         try (PDDocument doc = PDDocument.load(file)) {
             PDFRenderer renderer = new PDFRenderer(doc);
             List<BufferedImage> pages = new ArrayList<>();
@@ -26,6 +37,8 @@ class PdfLoader implements ImageLoader {
             return pages.stream().map(
                     awtImage -> awtLoader.load(awtImage, true))
                     .map(Texture2D::new)
+                    .map(imageRescaler::rescale)
+                    .map(SimpleTextureSlideFactory::new)
                     .collect(Collectors.toList());
 
         } catch (IOException e) {

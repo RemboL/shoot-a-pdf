@@ -1,5 +1,11 @@
 package pl.rembol.jme3.shootapdf.slide;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.input.KeyInput;
@@ -9,14 +15,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.texture.Texture2D;
 import pl.rembol.jme3.shootapdf.player.Player;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SlideManager {
 
@@ -24,7 +23,7 @@ public class SlideManager {
 
     private final SimpleApplication simpleApplication;
 
-    private final List<Texture2D> images;
+    private final List<SlideFactory> slideFactories;
 
     private final Player player;
 
@@ -38,14 +37,14 @@ public class SlideManager {
 
     private final Vector2f slideSize;
 
-    public SlideManager(SimpleApplication simpleApplication, List<Texture2D> images, Player player) {
+    public SlideManager(SimpleApplication simpleApplication, List<SlideFactory> slideFactories, Player player) {
         this.simpleApplication = simpleApplication;
-        this.images = images;
+        this.slideFactories = slideFactories;
         this.player = player;
 
         slideSize = new Vector2f(simpleApplication.getCamera().getWidth(), simpleApplication.getCamera().getHeight()).normalize().mult(5f);
 
-        if (!images.isEmpty()) {
+        if (!slideFactories.isEmpty()) {
             initSlide(0);
         }
 
@@ -78,7 +77,7 @@ public class SlideManager {
     }
 
     private void showNextSlide() {
-        if (currentSlide < images.size() - 1) {
+        if (currentSlide < slideFactories.size() - 1) {
             currentSlide++;
             initSlide(currentSlide);
         }
@@ -93,7 +92,7 @@ public class SlideManager {
 
     private void initSlide(Integer id) {
         clearSlide(id);
-        Slide slide = new Slide(simpleApplication, images.get(id), new Vector3f(0f, 0f, (id - images.size()) * 4f), slideSize);
+        Slide slide = slideFactories.get(id).create(simpleApplication, new Vector3f(0f, 0f, (id - slideFactories.size()) * 4f), slideSize);
         slides.put(id, slide);
 
         Set<Integer> slidesToBeRemoved = slides.keySet().stream().filter(i -> i > currentSlide).collect(Collectors.toSet());
@@ -103,7 +102,7 @@ public class SlideManager {
         }
         slidesToBeRemoved.forEach(this::clearSlide);
         simpleApplication.getRootNode().attachChild(slide);
-        viewPosition = new Vector3f(0, slideSize.y / 2, (id - images.size()) * 4f + .5f + (slideSize.x / simpleApplication.getCamera().getFrustumRight() / 4 * 0.468f * 4.25f)); // ratio achieved experimentally, 0.468 is somehow connected to atan(45deg) but 4.25 - no idea...
+        viewPosition = new Vector3f(0, slideSize.y / 2, (id - slideFactories.size()) * 4f + .5f + (slideSize.x / simpleApplication.getCamera().getFrustumRight() / 4 * 0.468f * 4.25f)); // ratio achieved experimentally, 0.468 is somehow connected to atan(45deg) but 4.25 - no idea...
         if (controlsEnabled) {
             simpleApplication.getCamera().setLocation(viewPosition);
             player.getControl(BetterCharacterControl.class).warp(getViewPosition().clone().setY(0f));

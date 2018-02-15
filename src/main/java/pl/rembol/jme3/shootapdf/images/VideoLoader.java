@@ -7,10 +7,12 @@ import java.util.stream.Stream;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.ColorRGBA;
-import com.jme3.texture.Texture2D;
 import com.jme3x.jfx.media.TextureMovie;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import pl.rembol.jme3.shootapdf.ImageRescaler;
+import pl.rembol.jme3.shootapdf.slide.SimpleTextureSlideFactory;
+import pl.rembol.jme3.shootapdf.slide.SlideFactory;
 
 class VideoLoader implements ImageLoader {
 
@@ -20,12 +22,15 @@ class VideoLoader implements ImageLoader {
 
     private SimpleApplication application;
 
-    VideoLoader(SimpleApplication application) {
+    private final ImageRescaler imageRescaler;
+
+    VideoLoader(SimpleApplication application, ImageRescaler imageRescaler) {
         this.application = application;
+        this.imageRescaler = imageRescaler;
     }
 
     @Override
-    public List<Texture2D> load(File file) {
+    public List<SlideFactory> load(File file) {
         final Media media = new Media(file.toURI().toString());
 
 
@@ -36,7 +41,8 @@ class VideoLoader implements ImageLoader {
         this.textureMovie = new TextureMovie(application, this.mediaPlayer, TextureMovie.LetterboxMode.VALID_LETTERBOX);
         this.textureMovie.setLetterboxColor(ColorRGBA.Black);
 
-        return Collections.singletonList(textureMovie.getTexture());
+        return Collections.singletonList(
+                new SimpleTextureSlideFactory(imageRescaler.rescale(textureMovie.getTexture())));
     }
 
     @Override
