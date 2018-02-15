@@ -7,16 +7,18 @@ import java.util.Collections;
 import java.util.List;
 import javax.imageio.ImageIO;
 
-import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.AbstractAppState;
+import com.jme3.app.Application;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image;
@@ -26,7 +28,7 @@ import com.sun.imageio.plugins.gif.GIFImageMetadata;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 import pl.rembol.jme3.shootapdf.ImageRescaler;
-import pl.rembol.jme3.shootapdf.slide.SimpleTextureSlideFactory;
+import pl.rembol.jme3.shootapdf.slide.Slide;
 import pl.rembol.jme3.shootapdf.slide.SlideFactory;
 
 public class GifLoader implements ImageLoader {
@@ -42,16 +44,13 @@ public class GifLoader implements ImageLoader {
         }
     }
 
-    private final SimpleApplication simpleApplication;
-    
     private final ImageRescaler imageRescaler;
 
-    GifLoader(SimpleApplication simpleApplication, ImageRescaler imageRescaler) {
-        this.simpleApplication = simpleApplication;
+    GifLoader(ImageRescaler imageRescaler) {
         this.imageRescaler = imageRescaler;
     }
 
-    private class GifAnimAppState extends AbstractAppState {
+    private static class GifAnimControl extends AbstractControl {
 
         private final List<GifFrame> frames;
 
@@ -63,14 +62,14 @@ public class GifLoader implements ImageLoader {
 
         private int currentFrame = 0;
 
-        GifAnimAppState(Texture2D texture, List<GifFrame> frames) {
+        GifAnimControl(Application application, Texture2D texture, List<GifFrame> frames) {
             this.frames = frames;
             frameQuads = new ArrayList<>();
 
             for (int i = 0; i < frames.size(); ++i) {
                 Geometry geometry = new Geometry("slide", new Quad(1, 1));
                 geometry.setLocalTranslation(-.5f, -.5f, -frames.size() + i);
-                Material material = new Material(simpleApplication.getAssetManager(),
+                Material material = new Material(application.getAssetManager(),
                         "Common/MatDefs/Misc/Unshaded.j3md");
                 material.setTexture("ColorMap", new Texture2D(frames.get(i).image));
                 material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
@@ -83,7 +82,7 @@ public class GifLoader implements ImageLoader {
             camera.setFrustumFar(frames.size() + 2);
             camera.setLocation(new Vector3f(0, 0, 1));
             camera.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
-            ViewPort modelView = simpleApplication.getRenderManager().createPreView("playerShipBarsView", camera);
+            ViewPort modelView = application.getRenderManager().createPreView("playerShipBarsView", camera);
             modelView.setClearFlags(true, true, true);
             FrameBuffer offBuffer = new FrameBuffer(frames.get(0).image.getWidth(), frames.get(0).image.getHeight(), 1);
             offBuffer.setDepthBuffer(Image.Format.Depth);
@@ -97,7 +96,8 @@ public class GifLoader implements ImageLoader {
 
         }
 
-        public void update(float tpf) {
+        @Override
+        protected void controlUpdate(float tpf) {
             timeToSwitchFrames -= tpf;
 
             while (timeToSwitchFrames <= 0) {
@@ -111,6 +111,33 @@ public class GifLoader implements ImageLoader {
 
                 timeToSwitchFrames += frames.get(currentFrame).delay * 0.01f;
             }
+        }
+
+        @Override
+        protected void controlRender(RenderManager rm, ViewPort vp) {
+
+        }
+    }
+
+    public static class GifSlideFactory extends SlideFactory {
+
+        private final Texture2D rescaledTexture;
+
+        private final Texture2D originalTexture;
+
+        private final List<GifFrame> frames;
+
+        GifSlideFactory(ImageRescaler imageRescaler, List<GifFrame> frames) {
+            originalTexture = new Texture2D(frames.get(0).image.getWidth(), frames.get(0).image.getHeight(), Image.Format.RGBA8);
+            this.rescaledTexture = imageRescaler.rescale(originalTexture);
+            this.frames = frames;
+        }
+
+        @Override
+        public Slide create(Application application, Vector3f position, Vector2f slideSize) {
+            Slide slide = new Slide(application, rescaledTexture, position, slideSize);
+            slide.addControl(new GifAnimControl(application, originalTexture, frames));
+            return slide;
         }
     }
 
@@ -128,9 +155,7 @@ public class GifLoader implements ImageLoader {
                         ((GIFImageMetadata) ir.getImageMetadata(i)).delayTime));
             }
 
-            Texture2D texture = new Texture2D(frames.get(0).image.getWidth(), frames.get(0).image.getHeight(), Image.Format.RGBA8);
-            simpleApplication.getStateManager().attach(new GifAnimAppState(texture, frames));
-            return Collections.singletonList(new SimpleTextureSlideFactory(imageRescaler.rescale(texture)));
+            return Collections.singletonList(new GifSlideFactory(imageRescaler, frames));
         } catch (IOException exception) {
             return Collections.emptyList();
         }
