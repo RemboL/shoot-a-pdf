@@ -60,7 +60,7 @@ public class GifLoader implements ImageLoader {
 
         private float timeToSwitchFrames = 0f;
 
-        private int currentFrame = 0;
+        private int currentFrame = -1;
 
         GifAnimControl(Application application, Texture2D texture, List<GifFrame> frames) {
             this.frames = frames;
