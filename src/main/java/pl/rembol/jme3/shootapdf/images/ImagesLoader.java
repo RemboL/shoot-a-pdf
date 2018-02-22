@@ -23,7 +23,7 @@ public class ImagesLoader {
         imageLoaders.add(new ImageIOLoader(imageRescaler));
         imageLoaders.add(new GifLoader(imageRescaler));
         imageLoaders.add(new DirectoryLoader(this));
-        imageLoaders.add(new VideoLoader(simpleApplication, imageRescaler));
+        imageLoaders.add(new VideoLoader(imageRescaler));
     }
 
     public List<SlideFactory> loadImages(List<File> files) {
