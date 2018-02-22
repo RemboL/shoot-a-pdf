@@ -1,7 +1,7 @@
  * ~~loading pdf~~
  * ~~parsing pdf into pictures (pages)~~
  * ~~displaying pdfs~~
- * add some scenery
+ * ~~add some scenery~~
  * ~~add fps movement~~
  * ~~putting pdfs onto stacked boxes that are affectable by physics~~
  * ~~add ball cannon~~
@@ -13,6 +13,6 @@
  * ~~different formats (list of jpg/png)~~
  * ~~animated gifs~~
  * ~~directory loader~~
- * loading mpegs
+ * ~~loading mpegs~~
  * load only 5-10 slides forward and backward (load more in separate thread)
  * add some bots maybe

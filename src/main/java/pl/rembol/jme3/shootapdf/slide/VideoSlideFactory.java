@@ -18,8 +18,6 @@ public class VideoSlideFactory extends SlideFactory {
 
     private final File file;
 
-    private MediaPlayer mediaPlayer;
-
     private TextureMovie textureMovie;
 
     public VideoSlideFactory(ImageRescaler imageRescaler, File file) {
@@ -32,7 +30,7 @@ public class VideoSlideFactory extends SlideFactory {
         final Media media = new Media(file.toURI().toString());
 
         media.errorProperty().addListener((observable, oldValue, newValue) -> newValue.printStackTrace());
-        mediaPlayer = new MediaPlayer(media);
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
         mediaPlayer.play();
         mediaPlayer.setCycleCount(Integer.MAX_VALUE);
 
@@ -41,6 +39,26 @@ public class VideoSlideFactory extends SlideFactory {
 
         Texture2D texture2D = imageRescaler.rescale(textureMovie.getTexture());
 
-        return new Slide(application, texture2D, position, slideSize);
+        return new VideoSlide(application, texture2D, position, slideSize, mediaPlayer);
+    }
+
+    private class VideoSlide extends Slide {
+
+        private final MediaPlayer mediaPlayer;
+
+        private VideoSlide(Application application, Texture2D texture, Vector3f position, Vector2f slideSize, MediaPlayer mediaPlayer) {
+            super(application, texture, position, slideSize);
+            this.mediaPlayer = mediaPlayer;
+        }
+
+        @Override
+        public void remove() {
+            super.remove();
+            System.out.println("disposing video "+file.getName());
+
+            mediaPlayer.stop();
+            mediaPlayer.dispose();
+        }
+
     }
 }
