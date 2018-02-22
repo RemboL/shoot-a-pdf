@@ -27,6 +27,7 @@ public class ImagesLoader {
     }
 
     public List<SlideFactory> loadImages(List<File> files) {
+        System.out.println("loading images: "+files.stream().map(File::getName).collect(Collectors.toList()));
         return files.stream()
                 .map(this::loadImages)
                 .flatMap(List::stream)

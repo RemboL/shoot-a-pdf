@@ -18,7 +18,7 @@ class DirectoryLoader implements ImageLoader {
 
     @Override
     public List<SlideFactory> load(File file) {
-        return Stream.of(file.listFiles()).map(Collections::singletonList).map(imagesLoader::loadImages).flatMap(List::stream).collect(Collectors.toList());
+        return Stream.of(file.listFiles()).sorted().map(Collections::singletonList).map(imagesLoader::loadImages).flatMap(List::stream).collect(Collectors.toList());
     }
 
     @Override

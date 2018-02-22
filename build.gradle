@@ -10,9 +10,8 @@ repositories {
     }
 }
 
-jfx {
-    mainClass = 'pl.rembol.jme3.shootapdf.Main'
-    vendor = 'RemboL'
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.5.1'
 }
 
 ext {

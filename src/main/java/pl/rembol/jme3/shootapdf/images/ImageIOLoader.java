@@ -22,7 +22,7 @@ class ImageIOLoader implements ImageLoader {
         this.imageRescaler = imageRescaler;
     }
 
-    @Override
+    @Override   
     public List<SlideFactory> load(File file) {
         try {
             BufferedImage img = ImageIO.read(file);
