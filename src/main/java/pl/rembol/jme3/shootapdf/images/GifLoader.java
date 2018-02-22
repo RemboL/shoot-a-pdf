@@ -1,12 +1,6 @@
 package pl.rembol.jme3.shootapdf.images;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import javax.imageio.ImageIO;
-
+import at.dhyan.open_imaging.GifDecoder;
 import com.jme3.app.Application;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
@@ -24,12 +18,17 @@ import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 import com.jme3.texture.plugins.AWTLoader;
-import com.sun.imageio.plugins.gif.GIFImageMetadata;
-import com.sun.imageio.plugins.gif.GIFImageReader;
-import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 import pl.rembol.jme3.shootapdf.ImageRescaler;
 import pl.rembol.jme3.shootapdf.slide.Slide;
 import pl.rembol.jme3.shootapdf.slide.SlideFactory;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GifLoader implements ImageLoader {
 
@@ -144,15 +143,14 @@ public class GifLoader implements ImageLoader {
     @Override
     public List<SlideFactory> load(File file) {
         try {
+            final GifDecoder.GifImage gif = GifDecoder.read(new FileInputStream(file));
+            final int frameCount = gif.getFrameCount();
             List<GifFrame> frames = new ArrayList<>();
-            GIFImageReader ir = new GIFImageReader(new GIFImageReaderSpi());
-            ir.setInput(ImageIO.createImageInputStream(file));
-
             AWTLoader awtLoader = new AWTLoader();
-            for (int i = 0; i < ir.getNumImages(true); i++) {
-                frames.add(new GifFrame(
-                        awtLoader.load(ir.read(i), true),
-                        ((GIFImageMetadata) ir.getImageMetadata(i)).delayTime));
+            for (int i = 0; i < frameCount; i++) {
+                final BufferedImage img = gif.getFrame(i);
+                final int delay = gif.getDelay(i);
+                frames.add(new GifFrame(awtLoader.load(img, true), delay));
             }
 
             return Collections.singletonList(new GifSlideFactory(imageRescaler, frames));
