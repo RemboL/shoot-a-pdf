@@ -30,7 +30,9 @@ class PdfLoader implements ImageLoader {
             PDFRenderer renderer = new PDFRenderer(doc);
             List<BufferedImage> pages = new ArrayList<>();
             for (int i = 0; i < doc.getNumberOfPages(); ++i) {
-                pages.add(renderer.renderImage(i));
+                pages.add(renderer.renderImage(i, 2f));
+                System.out.println(String.format("pdf[%s/%d].res = %dx%d", 
+                        file.getName(), i, pages.get(i).getWidth(), pages.get(i).getHeight()));
             }
 
             AWTLoader awtLoader = new AWTLoader();
