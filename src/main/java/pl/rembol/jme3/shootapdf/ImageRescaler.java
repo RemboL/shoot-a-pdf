@@ -1,6 +1,8 @@
 package pl.rembol.jme3.shootapdf;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.jme3.app.SimpleApplication;
@@ -18,6 +20,8 @@ import com.jme3.texture.Texture2D;
 public class ImageRescaler {
 
     private final SimpleApplication application;
+    
+    private final Map<Texture2D, ViewPort> viewPorts = new HashMap<>();
 
     public ImageRescaler(SimpleApplication application) {
         this.application = application;
@@ -32,7 +36,7 @@ public class ImageRescaler {
         Camera camera = new Camera(application.getCamera().getWidth(), application.getCamera().getHeight());
         camera.setLocation(new Vector3f(0, 0, 1));
         camera.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
-        ViewPort modelView = application.getRenderManager().createPreView("playerShipBarsView", camera);
+        ViewPort modelView = application.getRenderManager().createPreView("rescalerView", camera);
         modelView.setClearFlags(true, true, true);
         Texture2D offTexture = new Texture2D(application.getCamera().getWidth(), application.getCamera().getHeight(), Image.Format.RGBA8);
         FrameBuffer offBuffer = new FrameBuffer(application.getCamera().getWidth(), application.getCamera().getHeight(), 1);
@@ -60,6 +64,18 @@ public class ImageRescaler {
 
         scene.updateGeometricState();
         modelView.attachScene(scene);
+        
+        viewPorts.put(offTexture, modelView);
+        
         return offTexture;
     }
+    
+    public void dropViewPort(Texture2D texture2D) {
+    
+        if (viewPorts.containsKey(texture2D)) {
+            application.getRenderManager().removePreView(viewPorts.get(texture2D));
+            viewPorts.remove(texture2D);
+        }
+    }
 }
+

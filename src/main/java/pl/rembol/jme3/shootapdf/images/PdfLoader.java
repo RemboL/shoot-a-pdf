@@ -37,8 +37,7 @@ class PdfLoader implements ImageLoader {
             return pages.stream().map(
                     awtImage -> awtLoader.load(awtImage, true))
                     .map(Texture2D::new)
-                    .map(imageRescaler::rescale)
-                    .map(SimpleTextureSlideFactory::new)
+                    .map(texture2D -> new SimpleTextureSlideFactory(imageRescaler, texture2D))
                     .collect(Collectors.toList());
 
         } catch (IOException e) {

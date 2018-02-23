@@ -1,6 +1,12 @@
 package pl.rembol.jme3.shootapdf.slide;
 
-import at.dhyan.open_imaging.GifDecoder;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.jme3.app.Application;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
@@ -18,22 +24,14 @@ import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 import com.jme3.texture.plugins.AWTLoader;
+import at.dhyan.open_imaging.GifDecoder;
 import pl.rembol.jme3.shootapdf.ImageRescaler;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GifSlideFactory extends SlideFactory {
 
     private final ImageRescaler imageRescaler;
 
     private final File file;
-
-    private List<GifFrame> frames;
 
     public GifSlideFactory(ImageRescaler imageRescaler, File file) {
         this.imageRescaler = imageRescaler;
@@ -42,7 +40,7 @@ public class GifSlideFactory extends SlideFactory {
 
     @Override
     public Slide create(Application application, Vector3f position, Vector2f slideSize) {
-        Slide slide = new Slide(application, new Texture2D(1, 1, Image.Format.RGBA8), position, slideSize);
+        Slide slide = new Slide(application, imageRescaler, new Texture2D(1, 1, Image.Format.RGBA8), position, slideSize);
         try {
             final GifDecoder.GifImage gif = GifDecoder.read(new FileInputStream(file));
             final int frameCount = gif.getFrameCount();
@@ -55,8 +53,7 @@ public class GifSlideFactory extends SlideFactory {
             }
 
             Texture2D originalTexture = new Texture2D(frames.get(0).image.getWidth(), frames.get(0).image.getHeight(), Image.Format.RGBA8);
-            Texture2D rescaledTexture = imageRescaler.rescale(originalTexture);
-            slide = new Slide(application, rescaledTexture, position, slideSize);
+            slide = new Slide(application, imageRescaler, originalTexture, position, slideSize);
             slide.addControl(new GifAnimControl(application, originalTexture, frames));
         } catch (IOException e) {
             System.out.println("Exception caught while processing "+file.getName()+": "+e.getMessage());

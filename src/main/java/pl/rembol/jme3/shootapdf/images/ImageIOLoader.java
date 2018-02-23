@@ -27,7 +27,7 @@ class ImageIOLoader implements ImageLoader {
         try {
             BufferedImage img = ImageIO.read(file);
             return Collections.singletonList(new SimpleTextureSlideFactory(
-                    imageRescaler.rescale(new Texture2D(new AWTLoader().load(img, true)))));
+                    imageRescaler, new Texture2D(new AWTLoader().load(img, true))));
         } catch (IOException e) {
             e.printStackTrace();
             return Collections.emptyList();

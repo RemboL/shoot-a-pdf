@@ -1,5 +1,7 @@
 package pl.rembol.jme3.shootapdf.slide;
 
+import java.io.File;
+
 import com.jme3.app.Application;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
@@ -9,8 +11,6 @@ import com.jme3x.jfx.media.TextureMovie;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import pl.rembol.jme3.shootapdf.ImageRescaler;
-
-import java.io.File;
 
 public class VideoSlideFactory extends SlideFactory {
 
@@ -37,17 +37,15 @@ public class VideoSlideFactory extends SlideFactory {
         textureMovie = new TextureMovie(application, mediaPlayer, TextureMovie.LetterboxMode.VALID_LETTERBOX);
         textureMovie.setLetterboxColor(ColorRGBA.Black);
 
-        Texture2D texture2D = imageRescaler.rescale(textureMovie.getTexture());
-
-        return new VideoSlide(application, texture2D, position, slideSize, mediaPlayer);
+        return new VideoSlide(application, imageRescaler, textureMovie.getTexture(), position, slideSize, mediaPlayer);
     }
 
     private class VideoSlide extends Slide {
 
         private final MediaPlayer mediaPlayer;
 
-        private VideoSlide(Application application, Texture2D texture, Vector3f position, Vector2f slideSize, MediaPlayer mediaPlayer) {
-            super(application, texture, position, slideSize);
+        private VideoSlide(Application application, ImageRescaler imageRescaler, Texture2D texture, Vector3f position, Vector2f slideSize, MediaPlayer mediaPlayer) {
+            super(application, imageRescaler, texture, position, slideSize);
             this.mediaPlayer = mediaPlayer;
         }
 
