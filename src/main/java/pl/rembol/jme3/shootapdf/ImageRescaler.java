@@ -9,9 +9,12 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image;
@@ -46,21 +49,20 @@ public class ImageRescaler {
         modelView.setOutputFrameBuffer(offBuffer);
         Node scene = new Node("scene");
 
-        Quad quad;
-
-        if (texture.getImage().getHeight() * camera.getWidth() < camera.getHeight() * texture.getImage().getWidth()) {
-            quad = new Quad(1f, (texture.getImage().getHeight() * camera.getWidth()) / (1f * texture.getImage().getWidth() * camera.getHeight()));
-        } else {
-            quad = new Quad((camera.getHeight() * texture.getImage().getWidth()) / (1f * texture.getImage().getHeight() * camera.getWidth()), 1f);
-        }
-
+        Quad quad = new Quad(1, 1);
         Geometry geometry = new Geometry("slide", quad);
-        geometry.setLocalTranslation(-quad.getWidth() / 2, -quad.getHeight() / 2, -1);
+
+        resize(quad, geometry, texture, camera);
+
+        Node textureNode = new Node();
+        textureNode.attachChild(geometry);
+        textureNode.setLocalTranslation(0, 0, -1);
+        geometry.addControl(new ResizeQuadControl(quad, geometry, texture, camera));
         Material material = new Material(application.getAssetManager(),
                 "Common/MatDefs/Misc/Unshaded.j3md");
         material.setTexture("ColorMap", texture);
         geometry.setMaterial(material);
-        scene.attachChild(geometry);
+        scene.attachChild(textureNode);
 
         scene.updateGeometricState();
         modelView.attachScene(scene);
@@ -68,6 +70,61 @@ public class ImageRescaler {
         viewPorts.put(offTexture, modelView);
         
         return offTexture;
+    }
+
+    private static class ResizeQuadControl extends AbstractControl {
+
+        private final Quad quad;
+
+        private final Geometry geometry;
+
+        private final Texture2D texture2D;
+
+        private final Camera camera;
+
+        private ResizeQuadControl(Quad quad, Geometry geometry, Texture2D texture2D, Camera camera) {
+            this.quad = quad;
+            this.geometry = geometry;
+            this.texture2D = texture2D;
+            this.camera = camera;
+        }
+
+        @Override
+        protected void controlUpdate(float tpf) {
+        }
+
+        @Override
+        protected void controlRender(RenderManager rm, ViewPort vp) {
+            float quadRatio = quad.getWidth() / quad.getHeight();
+            float cameraRatio = 1f * camera.getWidth() / camera.getHeight();
+            float textureRatio = 1f * texture2D.getImage().getWidth() / texture2D.getImage().getHeight();
+            if (quadRatio != textureRatio / cameraRatio) {
+                resize(quad, geometry, texture2D, camera);
+            }
+
+        }
+
+    }
+
+    private static void resize(Quad quad, Geometry geometry, Texture2D texture2D, Camera camera) {
+        float cameraRatio = 1f * camera.getWidth() / camera.getHeight();
+        float textureRatio = 1f * texture2D.getImage().getWidth() / texture2D.getImage().getHeight();
+
+        if (cameraRatio / textureRatio < 1f) {
+            quad.updateGeometry(1f, cameraRatio / textureRatio);
+        } else {
+            quad.updateGeometry(textureRatio / cameraRatio, 1f);
+        }
+        geometry.setLocalTranslation(-quad.getWidth() / 2, -quad.getHeight() / 2, 0);
+        getRoot(geometry).updateGeometricState();
+    }
+
+    private static Spatial getRoot(Spatial element) {
+        if (element.getParent() == null) {
+            return element;
+        } else {
+            return getRoot(element.getParent());
+        }
     }
     
     public void dropViewPort(Texture2D texture2D) {

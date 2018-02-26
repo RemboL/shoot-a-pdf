@@ -34,7 +34,7 @@ public class VideoSlideFactory extends SlideFactory {
         mediaPlayer.play();
         mediaPlayer.setCycleCount(Integer.MAX_VALUE);
 
-        textureMovie = new TextureMovie(application, mediaPlayer, TextureMovie.LetterboxMode.VALID_LETTERBOX);
+        textureMovie = new TextureMovie(application, mediaPlayer, TextureMovie.LetterboxMode.VALID_SQUARE);
         textureMovie.setLetterboxColor(ColorRGBA.Black);
 
         return new VideoSlide(application, imageRescaler, textureMovie.getTexture(), position, slideSize, mediaPlayer);
